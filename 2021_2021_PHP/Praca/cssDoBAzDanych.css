@@ -1,0 +1,14 @@
+tabl, tr, td,th
+{
+  border: 1px solid grey;
+  border-collapse: collapse;
+  text-align: center;
+  padding: 8px;
+
+}
+
+th
+{
+  background-color: blue;
+
+}
