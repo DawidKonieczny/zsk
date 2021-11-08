@@ -1,6 +1,3 @@
-
 <?php
-
- $polonczenie = new mysqli("localhost","root","","4dg1_baza1");
-
-?>
+$connect = new mysqli("localhost", "root","", "zsk_4dg1_baza1");
+ ?>
