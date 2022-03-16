@@ -93,9 +93,19 @@
             }
 
             require_once "connect.php";
-            $minikwerenda="SELECT `id` FROM `konta` ORDER BY `id` DESC LIMIT 1"
-            $id=$connect -> query($minikwernda);
-            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `password`, `type`, `amount`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES (NULL, '$_POST[imie]', '$_POST[nazwisko]', '$_POST[dataUrodzenia]', '$_POST[wzrost]', '$_POST[miasto]')";
+
+            $pre="1000";
+            $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
+            $minikwerenda="SELECT COUNT(`id`) FROM `konta` WHERE `id` LIKE '$id'";
+            $licz=$connect -> query($minikwernda);
+            while ($licz>0)
+            {
+              $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
+              $minikwerenda="SELECT COUNT(`id`) FROM `konta` WHERE `id` LIKE '$id'";
+              $licz=$connect -> query($minikwernda);
+            }
+            $haslo=password_hash($_POST['password'],PASSWORD_ARGON2I);
+            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `password`, `type`, `amount`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES (NULL, '$id', '$_POST[username]', '$_POST[dataUrodzenia]', '$_POST[wzrost]', '$_POST[miasto]')";
             $connect -> query($kwerenda);
 
             if ($connect->affected_rows == 0)
