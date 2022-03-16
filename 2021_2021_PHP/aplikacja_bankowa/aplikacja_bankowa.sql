@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 15 Mar 2022, 20:20
+-- Czas generowania: 16 Mar 2022, 19:05
 -- Wersja serwera: 10.4.21-MariaDB
 -- Wersja PHP: 8.0.10
 
@@ -46,7 +46,7 @@ CREATE TABLE `konta` (
   `id` char(26) NOT NULL COMMENT 'numer konta',
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `type` int(1) NOT NULL,
+  `type` int(1) NOT NULL COMMENT '0-klient 1-moderator\r\n2-admin',
   `amount` varchar(57) NOT NULL COMMENT 'ilość środków na koncie',
   `name` varchar(57) NOT NULL,
   `surname` varchar(28) NOT NULL,
@@ -62,7 +62,8 @@ CREATE TABLE `konta` (
 --
 
 INSERT INTO `konta` (`id`, `username`, `password`, `type`, `amount`, `name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES
-('2147483647', 'testAdmin', 'e51a8473cbf0a307f744f751fac4ab48', 2, '', 'Jan', 'Kowalski', 'daleko', '11111111111', 'P', 'zw1234567', '2022-03-15');
+('10000000000000000000000000', 'testAdmin', 'e51a8473cbf0a307f744f751fac4ab48', 2, '10', 'Jan', 'Kowalski', 'dalek', '11111111111', 'P', 'zw1234567', '2022-03-15'),
+('10001234567891234567894444', 'testklient', '159d5fc0b541442e8867fb2b7fa06387', 0, '100', 'Samson', 'Wielki', 'pustynie', '11111111113', 'D', 'qwe444555', '2022-03-16');
 
 --
 -- Indeksy dla zrzutów tabel
