@@ -3,29 +3,39 @@
   <head>
     <meta charset="utf-8">
     <title>Rejestracja</title>
+    <link rel="stylesheet" href="css.css">
   </head>
   <body>
+      <?php
+      if (isset($_GET["error"]))
+      {
+        ?>
+          <p><?= $_GET["error"];?></p><br>
+        <?php
+      }
+
+      ?>
       <form action="" method="post">
 
         <label>
           Imie
           <input type="text" name="name">
-        </label>
+        </label><br>
 
         <label>
           Nazwisko
           <input type="text" name="surname">
-        </label>
+        </label><br>
 
         <label>
           Miejsce Zamieszkania
           <input type="text" name="home">
-        </label>
+        </label><br>
 
         <label>
           Pesel
           <input type="text" name="pesel">
-        </label>
+        </label><br>
 
         <label>
           Dowód czy Paszport?
@@ -33,37 +43,37 @@
             <option value="D">Dowód</option>
             <option value="P">Paszport</option>
           </select>
-        </label>
+        </label><br>
 
         <label>
           Nr Dowodu/Paszportu
           <input type="text" name="doc_nr">
-        </label>
+        </label><br>
 
         <label>
           Nazwa użytkownika (powinna posiadać min 8 znaków)
           <input type="text" name="username">
-        </label>
+        </label><br>
 
         <label>
           Hasło (powinno posiadać min 8 znaków)
-          <input type="text" name="password">
-        </label>
+          <input type="password" name="pwd">
+        </label><br>
 
         <label>
           Powtórz hasło
-          <input type="text" name="passwordchk">
-        </label>
+          <input type="password" name="pwdchk">
+        </label><br>
 
         <label>
           Czy chcesz odrazu się zalogować?
           <input type='hidden' value='0' name='zalog'>
           <input type="checkbox" name="zalog">
-        </label>
+        </label><br>
 
         <label>
           <input type="submit" name="zatwierdz" value="zatwierdź">
-        </label>
+        </label><br>
       </form>
       <?php
         if (!empty($_POST))
@@ -72,45 +82,61 @@
             {
                 if (empty($value))
                 {
-                  header('Location: rejestracja.php?info&error=Wypełnij pole ' . $key);
+                  header('Location: rejestracja.php?error=Wypełnij pole ' . $key);
+                  exit();
+                }
+                $_POST["$key"]=trim($_POST["$key"]);
+                if (str_contains($_POST["$key"], ';'))
+                {
+                  header('Location: rejestracja.php?error=Pole' . $key.'zawiera niepoprawną wartość');
                   exit();
                 }
             }
+
             if (strlen($_POST["username"])<8)
             {
-              header('Location: rejestracja.php?info&error=Nazwa użytkownika jest za krótka');
+              header('Location: rejestracja.php?error=Nazwa użytkownika jest za krótka');
               exit();
             }
-            if (strlen($_POST["password"])<8)
+            if (strlen($_POST["pwd"])<8)
             {
-              header('Location: rejestracja.php?info&error=Hasło jest za krótkie');
+              header('Location: rejestracja.php?error=Hasło jest za krótkie');
               exit();
             }
-            if ($_POST["password"]=!$_POST["passwordchk"])
+            if ($_POST["pwd"]=!$_POST["pwdchk"])
             {
-              header('Location: rejestracja.php?info&error=Podałeś różne hasła');
+              header('Location: rejestracja.php?error=Podałeś różne hasła');
               exit();
             }
 
             require_once "connect.php";
-
-            $pre="1000";
-            $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
-            $minikwerenda="SELECT COUNT(`id`) FROM `konta` WHERE `id` LIKE '$id'";
-            $licz=$connect -> query($minikwernda);
-            while ($licz>0)
+            $minik="SELECT `username` FROM `konta` WHERE `id` LIKE '$_POST[username]'";
+            $licz2=$connect -> query($minik);
+            if(mysqli_num_rows($licz2)>0)
             {
-              $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
-              $minikwerenda="SELECT COUNT(`id`) FROM `konta` WHERE `id` LIKE '$id'";
-              $licz=$connect -> query($minikwernda);
+              header("Location: rejestracja.php?error=Istnieje już taka nazwa użytkownika $licz2");
             }
-            $haslo=password_hash($_POST['password'],PASSWORD_ARGON2I);
-            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `password`, `type`, `amount`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES (NULL, '$id', '$_POST[username]', '$_POST[dataUrodzenia]', '$_POST[wzrost]', '$_POST[miasto]')";
+            $pre="1000";
+            $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999).random_int(10,99);
+            $minik2="SELECT `id` FROM `konta` WHERE `id` LIKE '$id'";
+            $licz=$connect -> query($minik2);
+            while (mysqli_num_rows($licz)>0)
+            {
+              $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999). random_int(1000,9999) . random_int(10,99);
+              $minik2="SELECT `id` FROM `konta` WHERE `id` LIKE '$id'";
+              $licz=$connect -> query($minik2);
+            }
+            $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
+            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `pwd`, `type`, `amount`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES ('$id', '$_POST[username]', '$haslo', '0', '0', '$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]', '$_POST[date_account]')";
             $connect -> query($kwerenda);
 
             if ($connect->affected_rows == 0)
             {
-              header('Location: rejestracja.php?info&error=Nie udało się dodać użytkownika');
+              header('Location: rejestracja.php?error=Nie udało się dodać użytkownika');
+            }
+            else
+            {
+              header('Location: logowanie.php?error=Utworzono konto');
             }
 
         }

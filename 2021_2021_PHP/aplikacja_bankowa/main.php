@@ -3,17 +3,23 @@
   <head>
     <meta charset="utf-8">
     <title>Strona Główna</title>
+    <link rel="stylesheet" href="css.css">
   </head>
   <body>
-    <nav>
-      <?php
 
-
-       ?>
-    </nav>
     <main>
       <article>
-        Póki co nic tu nie ma
+        <?php
+        session_start();
+        echo <<< Dane
+        $_SESSION[id]
+        $_SESSION[username]
+        $_SESSION[password]
+        $_SESSION[type]
+        $_SESSION[amount]
+        WHYYY??
+        Dane;
+         ?>
       </article>
     </main>
   </body>
