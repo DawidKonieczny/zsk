@@ -6,15 +6,15 @@
     <link rel="stylesheet" href="css.css">
   </head>
   <body>
-
+    <?php require_once "header.php"; ?>
     <main>
       <article>
         <?php
-        session_start();
+        @session_start();
         echo <<< Dane
         $_SESSION[id]
         $_SESSION[username]
-        $_SESSION[password]
+        $_SESSION[pwd]
         $_SESSION[type]
         $_SESSION[amount]
         WHYYY??

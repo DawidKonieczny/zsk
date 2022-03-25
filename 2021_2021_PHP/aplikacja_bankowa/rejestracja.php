@@ -118,12 +118,12 @@
             }
             $pre="1000";
             $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999).random_int(10,99);
-            $minik2="SELECT `id` FROM `konta` WHERE `id` LIKE '$id'";
+            $minik2="SELECT `id` FROM `konta` WHERE `id` = '$id'";
             $licz=$connect -> query($minik2);
             while (mysqli_num_rows($licz)>0)
             {
               $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999). random_int(1000,9999) . random_int(10,99);
-              $minik2="SELECT `id` FROM `konta` WHERE `id` LIKE '$id'";
+              $minik2="SELECT `id` FROM `konta` WHERE `id` = '$id'";
               $licz=$connect -> query($minik2);
             }
             $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);

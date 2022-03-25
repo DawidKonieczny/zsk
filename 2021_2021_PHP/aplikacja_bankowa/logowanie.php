@@ -12,14 +12,13 @@
       session_start();
       ?>
         <p><?= $_GET["error"];?></p><br>
-        <p><?= $_SESSION['type'];?></p><br>
 
       <?php
     }
     ?>
 
     <article>
-      <form action="" method="post">
+      <form action="logowanie.php" method="post">
 
         <label>
           Nazwa użytkownika
@@ -40,9 +39,10 @@
       </div>
     </article>
     <?php
-
+      require_once "connect.php";
       if (!empty($_POST))
       {
+        print_r($_POST);
         foreach($_POST as $key => $value)
         {
             if (empty($value))
@@ -57,40 +57,33 @@
               exit();
             }
         }
-        require_once "connect.php";
-        $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
-        $kwerenda = "SELECT `id` FROM `konta` WHERE `username` LIKE '$_POST[username]' && `pwd` LIKE '$haslo'";
-        $wynik=mysqli_query($connect,$kwerenda);
-        if (is_null($wynik))
-        {
-          header('Location: logowanie.php?error=Błędny login lub hasło');
 
-        }
-        else
+        $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
+        $kwerenda = "SELECT `id` FROM `konta` WHERE `username` = '$_POST[username]'";
+        $wynik=mysqli_query($connect,$kwerenda);
+        var_dump($wynik);
+        if (!$wynik)
+          die($connect->error);
+
+        @session_start();
+
+        $kwerenda = "SELECT `amount`, `username`, `type`, `id`, `pwd`  FROM `konta` WHERE `username` = '$_POST[username]'";
+        $res=mysqli_query($connect,$kwerenda);
+
+        if(!$res)
         {
-          session_start();
-          $kwerenda = "SELECT `amount` FROM `konta` WHERE `username` LIKE '$_POST[username]' && `pwd` LIKE '$haslo'";
-          $res=mysqli_query($connect,$kwerenda);
-          $dana= mysqli_fetch_assoc($res);
-          $_SESSION['amount']= $dana[0];
-          $kwerenda = "SELECT `username` FROM `konta` WHERE `username` LIKE '$_POST[username]' && `pwd` LIKE '$haslo'";
-          $res=mysqli_query($connect,$kwerenda);
-          $dana= mysqli_fetch_assoc($res);
-          $_SESSION['username']=$dana[0];
-          $kwerenda = "SELECT `type` FROM `konta` WHERE `username` LIKE '$_POST[username]' && `pwd` LIKE '$haslo'";
-          $res=mysqli_query($connect,$kwerenda);
-          $dana= mysqli_fetch_assoc($res);
-          $_SESSION['type']=$dana[0];
-          $kwerenda = "SELECT `id` FROM `konta` WHERE `username` LIKE '$_POST[username]' && `pwd` LIKE '$haslo'";
-          $res=mysqli_query($connect,$kwerenda);
-          $dana= mysqli_fetch_assoc($res);
-          $_SESSION['id']=$dana[0];
-          $kwerenda = "SELECT `pwd` FROM `konta` WHERE `username` LIKE '$_POST[username]' && `pwd` LIKE '$haslo'";
-          $res=mysqli_query($connect,$kwerenda);
-          $dana= mysqli_fetch_assoc($res);
-          $_SESSION['pwd']=$dana[0];
-          header('Location: main.php?error=Zalogowno');
+          die($connect->error);
         }
+
+        $dane= mysqli_fetch_assoc($res);
+
+        if(mysqli_num_rows($dane) == 1)
+          die($connect->error);
+
+        foreach ($dane as $key => $value)
+          $_SESSION["$key"]=$value;
+
+        header('Location: main.php?error=Zalogowno');
       }
     ?>
 

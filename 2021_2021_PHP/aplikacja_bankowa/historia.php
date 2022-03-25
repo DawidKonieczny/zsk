@@ -6,11 +6,11 @@
     <link rel="stylesheet" href="css.css">
   </head>
   <body>
-    <?php require_once "header.php" ?>
+    <?php require_once "header.php";?>
     <main>
       <article>
         <p>Sortowanie</p>
-        <! –– Tu zostanie dodany system sortowania ––>
+        <!–– Tu zostanie dodany system sortowania ––>
       </article>
       <table>
         <th>Id przelewu</th>

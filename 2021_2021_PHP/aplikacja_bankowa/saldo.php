@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="css.css">
   </head>
   <body>
-    <?php require_once "header.php" ?>
+    <?php
+    require_once "header.php";
+    require_once 'connect.php';
+     ?>
     <main>
       <?php
       if (isset($_GET["braki"]))
@@ -18,13 +21,22 @@
 
       ?>
       <article>
-        <?php $kwerenda="SELECT * FROM `konta` WHERE `id` LIKE `$_SESSION[id]`";
+        <?php
+        $kwerenda="SELECT * FROM `konta` WHERE `id` = '$_SESSION[id]';";
+        print_r($_SESSION['id']);
         $wynik= $connect -> query($kwerenda);
+        function str_contains($heystack, $needle)
+        {
+          foreach(explode($heystack,"") as $character)
+            if ($character == $needle)
+              return true;
+          return false;
+        }
         while ($wiersz= $wynik -> fetch_assoc())
         {
-        echo <<< konto
-          <p> Numer konta : <br> $wiersz['id'] </p>
-        konto;
+
+          echo "<p> Numer konta : <br> $wiersz[id]</p>";
+
         ?>
           <form action="" method="post">
 
@@ -88,7 +100,7 @@
                   exit();
                 }
                 $_POST["$key"]=trim($_POST["$key"]);
-                if str_contains($_POST["$key"], ';')
+                if (str_contains($_POST["$key"], ';'))
                 {
                   header('Location: saldo.php?braki=Pole' . $key.'zawiera niepoprawną wartość');
                   exit();
@@ -105,14 +117,15 @@
               exit();
             }
 
-            $minikwerenda2="SELECT COUNT(`username`) FROM `konta` WHERE `id` LIKE '$_POST[username]'";
+            $minikwerenda2="SELECT COUNT(`username`) FROM `konta` WHERE `id` = '$_POST[username]'";
             $licz2=$connect -> query($minikwernda2);
             if($licz2>0)
             {
               header('Location: saldo.php?braki=Nie udało się zmienić danych, błędna nazwa użytkownika');
             }
             $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
-            $kwerenda = "UPDATE `konta` SET  `username`='$_POST[username]', `pwd`='$haslo',`name`='$_POST[name]', `surname`='$_POST[surname]', `home`='$_POST[home]', `pesel`='$_POST[pesel]', `D_czy_P`='$_POST[D_czy_P]', `doc_nr`='$_POST[doc_nr]', `date_account`='$_POST[date_account]')";
+            $kwerenda = "UPDATE `konta` SET  `username`='$_POST[username]', `pwd`='$haslo',`name`='$_POST[name]', `surname`='$_POST[surname]', `home`='$_POST[home]', `pesel`='$_POST[pesel]', `D_czy_P`='$_POST[D_czy_P]',
+            `doc_nr`='$_POST[doc_nr]', `date_account`='$_POST[date_account]' WHERE `id`='$_SESSION[id]'";
             $connect -> query($kwerenda);
             if ($connect->affected_rows == 0)
             {

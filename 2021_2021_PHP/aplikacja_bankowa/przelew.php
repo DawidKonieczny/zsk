@@ -6,7 +6,9 @@
     <link rel="stylesheet" href="css.css">
   </head>
   <body>
-    <?php require_once "header.php" ?>
+    <?php
+    require_once "header.php";
+    require_once "connect.php"; ?>
     <main>
       <p>Przelew</p>
       <?php
@@ -46,27 +48,31 @@
               $_POST["$key"]=trim($_POST["$key"]);
               if (str_contains($_POST["$key"], ';'))
               {
-                header('Location: rejestracja.php?error=Pole' . $key.'zawiera niepoprawną wartość');
+                header('Location: przelew.php?error=Pole' . $key.'zawiera niepoprawną wartość');
                 exit();
               }
           }
           session_start();
           require_once "connect.php";
-          $amountt=str_replace(",",".",$_POST['amount']);
+          $amountt = str_replace(",", ".", $_POST['amount']);
           $kwerenda="INSERT INTO `historia`(`id_history`, `endowed`, `title`, `amount`, `date`, `generous`) VALUES ( NULL,'$_POST[endowed]','$_POST[title]','$amountt', NULL,'$_SESSION[id]')";
           $connect -> query($kwerenda);
-          $kwerenda = "SELECT `amount` FROM `konta` WHERE `username` LIKE '$_SESSION[username]'";
+          $kwerenda = "SELECT `amount` FROM `konta` WHERE `username` = '$_SESSION[username]'";
           $_SESSION['amount']= $connect -> query($kwerenda);
+          if($_SESSION['amount'] < $_POST['amount'])
+          {
+            die ( $connect -> error ) ;
+          }
           $_SESSION['amount']=$_SESSION['amount']-$_POST['amount'];
-          $kwerenda ="UPDATE `konta` SET `amount` = '$_SESSION[amount]' WHERE `konta`.`id` = '$_SESSION[id]'"; 
+          $kwerenda=" UPDATE `konta` SET `amount` = '$_SESSION[amount]' WHERE `konta`.`id` = '$_SESSION[id]'";
           $connect -> query($kwerenda);
           if ($connect->affected_rows > 0)
           {
-            header('Location: rejestracja.php?error=Przelew powiódł się!');
+            header('Location: przelew.php?error=Przelew powiódł się!');
           }
           else
           {
-            header('Location: rejestracja.php?error=Przelew nie powiódł się..');
+            header('Location: przelew.php?error=Przelew nie powiódł się..');
           }
       }
 
