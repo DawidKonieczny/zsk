@@ -23,22 +23,14 @@
       <article>
         <?php
         $kwerenda="SELECT * FROM `konta` WHERE `id` = '$_SESSION[id]';";
-        print_r($_SESSION['id']);
         $wynik= $connect -> query($kwerenda);
-        function str_contains($heystack, $needle)
-        {
-          foreach(explode($heystack,"") as $character)
-            if ($character == $needle)
-              return true;
-          return false;
-        }
         while ($wiersz= $wynik -> fetch_assoc())
         {
 
           echo "<p> Numer konta : <br> $wiersz[id]</p>";
 
         ?>
-          <form action="" method="post">
+          <form action="saldo.php" method="post">
 
             <label>
               Imie
@@ -122,6 +114,7 @@
             if($licz2>0)
             {
               header('Location: saldo.php?braki=Nie udało się zmienić danych, błędna nazwa użytkownika');
+              exit();
             }
             $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
             $kwerenda = "UPDATE `konta` SET  `username`='$_POST[username]', `pwd`='$haslo',`name`='$_POST[name]', `surname`='$_POST[surname]', `home`='$_POST[home]', `pesel`='$_POST[pesel]', `D_czy_P`='$_POST[D_czy_P]',
@@ -130,10 +123,12 @@
             if ($connect->affected_rows == 0)
             {
               header('Location: saldo.php?braki=Nie udało się zmienić danych użytkownika');
+              exit();
             }
             else
             {
               header('Location: saldo.php?braki=Udało zmienić się dane użytkownika');
+              exit();
             }
 
         }

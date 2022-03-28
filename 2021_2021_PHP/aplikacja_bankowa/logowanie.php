@@ -58,13 +58,14 @@
             }
         }
 
-        $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
         $kwerenda = "SELECT `id` FROM `konta` WHERE `username` = '$_POST[username]'";
         $wynik=mysqli_query($connect,$kwerenda);
         var_dump($wynik);
         if (!$wynik)
           die($connect->error);
-
+        $kwerenda = "SELECT `pwd` FROM `konta` WHERE `username` = '$_POST[username]'";
+        $haslo=konwerter($kwerenda,$connect);
+        $czyhaslo=password_verify($_POST['pwd'],$haslo);
         @session_start();
 
         $kwerenda = "SELECT `amount`, `username`, `type`, `id`, `pwd`  FROM `konta` WHERE `username` = '$_POST[username]'";
@@ -76,14 +77,10 @@
         }
 
         $dane= mysqli_fetch_assoc($res);
-
-        if(mysqli_num_rows($dane) == 1)
-          die($connect->error);
-
         foreach ($dane as $key => $value)
           $_SESSION["$key"]=$value;
-
         header('Location: main.php?error=Zalogowno');
+        
       }
     ?>
 

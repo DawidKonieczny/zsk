@@ -23,11 +23,11 @@
         require_once "connect.php";
         if ($_SESSION['type']>0)
         {
-          $kwerenda="SELECT `id_history`,`endowed`,`title`,`amount`,`date`,`generous`FROM `historia`";
+          $kwerenda="SELECT * FROM `historia`";
         }
         else
         {
-          $kwerenda="SELECT `id_history`,`endowed`,`title`,`amount`,`date`,`generous`FROM `historia` WHERE `endowed` LIKE '$_SESSION[id]' OR `generous` LIKE '$_SESSION[id]' ";
+          $kwerenda="SELECT `endowed`,`title`,`amount`,`date`,`generous`FROM `historia` WHERE `endowed` = '$_SESSION[id]' OR `generous` = '$_SESSION[id]' ";
         }
         $wynik= $connect -> query($kwerenda);
         while ($wiersz= $wynik -> fetch_assoc())

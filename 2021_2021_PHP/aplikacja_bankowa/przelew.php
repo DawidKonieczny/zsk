@@ -10,17 +10,18 @@
     require_once "header.php";
     require_once "connect.php"; ?>
     <main>
-      <p>Przelew</p>
+     <article>
+      <p>Przelew</p><br>
       <?php
       if (isset($_GET["error"]))
       {
         ?>
-          <p><?= $_GET["error"];?></p>
+          <p><?= $_GET["error"];?></p><br>
         <?php
       }
 
       ?>
-      <form action="" method="post">
+      <form action="przelew.php" method="post">
         <label>
           Podaj numer konta na który chcesz wysłać przelew
           <input type="text" name="endowed">
@@ -36,6 +37,7 @@
         <input type="submit" name="zatwierdz" value="wyślij">
       </form>
       <?php
+
       if (!empty($_POST))
       {
           foreach($_POST as $key => $value)
@@ -52,31 +54,59 @@
                 exit();
               }
           }
-          session_start();
           require_once "connect.php";
+
           $amountt = str_replace(",", ".", $_POST['amount']);
-          $kwerenda="INSERT INTO `historia`(`id_history`, `endowed`, `title`, `amount`, `date`, `generous`) VALUES ( NULL,'$_POST[endowed]','$_POST[title]','$amountt', NULL,'$_SESSION[id]')";
-          $connect -> query($kwerenda);
+
           $kwerenda = "SELECT `amount` FROM `konta` WHERE `username` = '$_SESSION[username]'";
-          $_SESSION['amount']= $connect -> query($kwerenda);
+          $_SESSION['amount'] = konwerter($kwerenda, $connect);
+          print_r($_SESSION['amount']);
+
+          if (!preg_match ("/^[0-9]*$/", $_POST['amount']))
+          {
+            header('Location: przelew.php?error=Niepowrawna wartość przelewu');
+            exit();
+          }
+
+
+          if( 0 > $_POST['amount'])
+          {
+            header('Location: przelew.php?error=Niepowrawna wartość przelewu');
+            exit();
+          }
+
+
           if($_SESSION['amount'] < $_POST['amount'])
           {
-            die ( $connect -> error ) ;
+            header('Location: przelew.php?error=Niewystarczająca ilośc środków');
+            exit();
+          }
+
+          $kwerenda = "INSERT INTO `historia`(`id_history`, `endowed`, `title`, `amount`, `generous`) VALUES ( NULL,'$_POST[endowed]','$_POST[title]','$amountt','$_SESSION[id]')";
+          $connect -> query($kwerenda);
+          if ($connect->affected_rows < 1)
+          {
+            header("Location: przelew.php?error=Nie zaksięgowano przelewu $_SESSION[amount]");
+            exit();
           }
           $_SESSION['amount']=$_SESSION['amount']-$_POST['amount'];
-          $kwerenda=" UPDATE `konta` SET `amount` = '$_SESSION[amount]' WHERE `konta`.`id` = '$_SESSION[id]'";
+          $kwerenda = " UPDATE `konta` SET `amount` = '$_SESSION[amount]' WHERE `konta`.`id` = '$_SESSION[id]'";
           $connect -> query($kwerenda);
+
           if ($connect->affected_rows > 0)
           {
             header('Location: przelew.php?error=Przelew powiódł się!');
+            exit();
           }
           else
           {
             header('Location: przelew.php?error=Przelew nie powiódł się..');
+            exit();
           }
       }
 
       ?>
+     </article>
     </main>
   </body>
 </html>

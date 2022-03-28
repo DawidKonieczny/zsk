@@ -15,7 +15,7 @@
       }
 
       ?>
-      <form action="" method="post">
+      <form action="rejestracja.php" method="post">
 
         <label>
           Imie
@@ -115,6 +115,7 @@
             if(mysqli_num_rows($licz2)>0)
             {
               header("Location: rejestracja.php?error=Istnieje już taka nazwa użytkownika $licz2");
+              exit();
             }
             $pre="1000";
             $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999).random_int(10,99);
@@ -133,10 +134,12 @@
             if ($connect->affected_rows == 0)
             {
               header('Location: rejestracja.php?error=Nie udało się dodać użytkownika');
+              exit();
             }
             else
             {
               header('Location: logowanie.php?error=Utworzono konto');
+              exit();
             }
 
         }

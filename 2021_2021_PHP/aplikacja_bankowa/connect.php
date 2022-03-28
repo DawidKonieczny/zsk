@@ -1,11 +1,23 @@
 <?php
 $connect = new mysqli("localhost", "root", "", "aplikacja_bankowa");
-$connection = new mysqli("localhost", "root", "", "aplikacja_bankowa");
-function str_contains($heystack, $needle)
+if (function_exists('str_contains'))
 {
-  foreach(explode($heystack,"") as $character)
-    if ($character == $needle)
-      return true;
-  return false;
+
 }
- ?>
+else {
+  function str_contains($heystack, $needle)
+  {
+    foreach(explode($heystack,"") as $character)
+      if ($character == $needle)
+        return true;
+    return false;
+  }
+}
+function konwerter($kwerenda, $connect)
+{
+  $wynik=$connect -> query($kwerenda);
+  $wynik= $wynik -> fetch_assoc();
+  $wynik=  implode("",$wynik);
+  return $wynik;
+}
+?>

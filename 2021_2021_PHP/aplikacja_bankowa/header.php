@@ -5,12 +5,14 @@
   if (is_null($_SESSION['type']))
   {
     header('Location: logowanie.php?ty&error=Zaloguj się');
+    exit();
   }
   else {
     function wylog()
     {
       session_destroy();
       header('Location: logowanie.php?error=Wylogowano pomyślnie');
+      exit();
     }
     if (isset($_GET['wylog']))
     {
