@@ -42,7 +42,7 @@
       require_once "connect.php";
       if (!empty($_POST))
       {
-        print_r($_POST);
+
         foreach($_POST as $key => $value)
         {
             if (empty($value))
@@ -60,27 +60,36 @@
 
         $kwerenda = "SELECT `id` FROM `konta` WHERE `username` = '$_POST[username]'";
         $wynik=mysqli_query($connect,$kwerenda);
-        var_dump($wynik);
         if (!$wynik)
           die($connect->error);
         $kwerenda = "SELECT `pwd` FROM `konta` WHERE `username` = '$_POST[username]'";
         $haslo=konwerter($kwerenda,$connect);
+        print_r($haslo);
         $czyhaslo=password_verify($_POST['pwd'],$haslo);
-        @session_start();
-
-        $kwerenda = "SELECT `amount`, `username`, `type`, `id`, `pwd`  FROM `konta` WHERE `username` = '$_POST[username]'";
-        $res=mysqli_query($connect,$kwerenda);
-
-        if(!$res)
+        var_dump($czyhaslo);
+        if($czyhaslo)
         {
-          die($connect->error);
+          print_r($czyhaslo);
+          @session_start();
+
+          $kwerenda = "SELECT `amount`, `username`, `type`, `id`, `pwd`  FROM `konta` WHERE `username` = '$_POST[username]'";
+          $res=mysqli_query($connect,$kwerenda);
+
+          if(!$res)
+          {
+            die($connect->error);
+          }
+
+          $dane= mysqli_fetch_assoc($res);
+          foreach ($dane as $key => $value)
+          {
+            $_SESSION["$key"]=$value;
+            print_r($_SESSION["$key"]);
+          };
+          header('Location: main.php?error=Zalogowno');
         }
 
-        $dane= mysqli_fetch_assoc($res);
-        foreach ($dane as $key => $value)
-          $_SESSION["$key"]=$value;
-        header('Location: main.php?error=Zalogowno');
-        
+
       }
     ?>
 

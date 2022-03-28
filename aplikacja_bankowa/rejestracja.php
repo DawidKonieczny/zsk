@@ -67,7 +67,6 @@
 
         <label>
           Czy chcesz odrazu się zalogować?
-          <input type='hidden' value='0' name='zalog'>
           <input type="checkbox" name="zalog">
         </label><br>
 
@@ -78,14 +77,18 @@
       <?php
         if (!empty($_POST))
         {
+
             foreach($_POST as $key => $value)
             {
                 if (empty($value))
                 {
-                  header('Location: rejestracja.php?error=Wypełnij pole ' . $key);
-                  exit();
+                  if($key!="zalog")
+                  {
+                    header('Location: rejestracja.php?error=Wypełnij pole ' . $key);
+                    exit();
+                  }
+
                 }
-                $_POST["$key"]=trim($_POST["$key"]);
                 if (str_contains($_POST["$key"], ';'))
                 {
                   header('Location: rejestracja.php?error=Pole' . $key.'zawiera niepoprawną wartość');
@@ -98,12 +101,12 @@
               header('Location: rejestracja.php?error=Nazwa użytkownika jest za krótka');
               exit();
             }
-            if (strlen($_POST["pwd"])<8)
+            if (strlen($_POST['pwd'])<8)
             {
               header('Location: rejestracja.php?error=Hasło jest za krótkie');
               exit();
             }
-            if ($_POST["pwd"]=!$_POST["pwdchk"])
+            if ($_POST["pwd"]=!$_POST['pwdchk'])
             {
               header('Location: rejestracja.php?error=Podałeś różne hasła');
               exit();
@@ -111,7 +114,7 @@
 
             require_once "connect.php";
             $minik="SELECT `username` FROM `konta` WHERE `id` LIKE '$_POST[username]'";
-            $licz2=$connect -> query($minik);
+            $licz2 = $connect -> query($minik);
             if(mysqli_num_rows($licz2)>0)
             {
               header("Location: rejestracja.php?error=Istnieje już taka nazwa użytkownika $licz2");
@@ -127,8 +130,9 @@
               $minik2="SELECT `id` FROM `konta` WHERE `id` = '$id'";
               $licz=$connect -> query($minik2);
             }
-            $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
-            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `pwd`, `type`, `amount`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES ('$id', '$_POST[username]', '$haslo', '0', '0', '$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]', '$_POST[date_account]')";
+            
+            $haslo = password_hash($_POST['pwdchk'], PASSWORD_ARGON2I);
+            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `pwd`, `type`, `amount`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`) VALUES ('$id', '$_POST[username]', '$haslo', '0', '0', '$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]')";
             $connect -> query($kwerenda);
 
             if ($connect->affected_rows == 0)

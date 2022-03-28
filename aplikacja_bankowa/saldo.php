@@ -110,8 +110,8 @@
             }
 
             $minikwerenda2="SELECT COUNT(`username`) FROM `konta` WHERE `id` = '$_POST[username]'";
-            $licz2=$connect -> query($minikwernda2);
-            if($licz2>0)
+            $licz2=$connect -> query($minikwerenda2);
+            if($licz2>1)
             {
               header('Location: saldo.php?braki=Nie udało się zmienić danych, błędna nazwa użytkownika');
               exit();

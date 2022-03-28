@@ -18,6 +18,8 @@ function konwerter($kwerenda, $connect)
   $wynik=$connect -> query($kwerenda);
   $wynik= $wynik -> fetch_assoc();
   $wynik=  implode("",$wynik);
+
+
   return $wynik;
 }
 ?>

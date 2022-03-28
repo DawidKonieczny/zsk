@@ -99,7 +99,7 @@
 
             <label>
               Hasło (powinno posiadać min 8 znaków)
-              <input type="password" name="password">
+              <input type="password" name="pwd">
             </label><br>
 
             <label>
@@ -112,13 +112,12 @@
 
         if (!empty($_POST))
         {
-            var_dump(  $_POST['type']);
-            print_r(  $_POST['type']);
-            if (empty($_POST['password']))
+
+            if (empty($_POST['pwd']))
             {
               $pwd=false;
               $kwerenda="SELECT `pwd` FROM `konta` WHERE `id` =".$_GET['id'];
-              $_POST['password']=konwerter($kwerenda,$connect);
+              $_POST['pwd']=konwerter($kwerenda,$connect);
             }
             if (empty($_POST['type']))
             {
@@ -146,7 +145,7 @@
               header('Location: edytuj.php?id='.$_GET['id'].'&braki=Nazwa użytkownika jest za krótka');
               exit();
             }
-            if (strlen($_POST["password"])<8)
+            if (strlen($_POST["pwd"])<8)
             {
               header('Location: edytuj.php?id='.$_GET['id'].'&braki=Hasło jest za krótkie');
               exit();
@@ -155,27 +154,28 @@
             $minikwerenda="SELECT COUNT(`id`) FROM `konta` WHERE `id` LIKE '$_POST[id]'";
             $licz=$connect -> query($minikwerenda);
             $minikwerenda2="SELECT COUNT(`username`) FROM `konta` WHERE `id` LIKE '$_POST[username]'";
-            $licz2=$connect -> query($minikwernda2);
-            if($licz>0 or strlen($_POST['id']!=26) or $licz2>0)
+            $licz2=$connect -> query($minikwerenda2);
+            if($licz>1 or strlen($_POST['id'])!=26 or $licz2>1)
             {
-              header('Location: edycja.php?braki=Nie udało się dodać użytkownika błędny numer konta lub nazwa użytkownika');
+              header('Location: edytuj.php?id='.$_GET['id'].'&braki=Nie udało się dodać użytkownika błędny numer konta lub nazwa użytkownika');
               exit();
             }
             if($pwd)
-              $haslo=password_hash($_POST['password'],PASSWORD_ARGON2I);
+              $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
             else {
-              $haslo=$_POST['password'];
+              $haslo=$_POST['pwd'];
             }
-            $kwerenda = "UPDATE `konta` SET `id`= '$_POST[id]', `username`='$_POST[username]', `password`='$haslo', `type`='$_POST[type]',`name`='$_POST[name]', `surname`='$_POST[surname]', `home`='$_POST[home]', `pesel`='$_POST[pesel]',`D_czy_P`='$_POST[D_czy_P]', `doc_nr`='$_POST[doc_nr]', `date_account`='$_POST[date_account]')";
+            $kwerenda = "UPDATE `konta` SET `id`= '$_POST[id]', `username`='$_POST[username]', `pwd`='$haslo', `type`='$_POST[type]',`name`='$_POST[name]', `surname`='$_POST[surname]', `home`='$_POST[home]', `pesel`='$_POST[pesel]',`D_czy_P`='$_POST[D_czy_P]', `doc_nr`='$_POST[doc_nr]', `date_account`='$_POST[date_account]')";
             $connect -> query($kwerenda);
-            if ($connect->affected_rows == 0)
+            if ($connect->affected_rows > 0)
             {
-              header('Location: edytuj.php?braki=Nie udało się dodać użytkownika');
+
+              header('Location: crud.php?id='.$_GET['id'].'&braki=Edycja się udała');
               exit();
             }
             else
             {
-              header('Location: crud.php?error=Utworzono konto');
+              header('Location: edytuj.php?id='.$_GET['id'].'&braki=Nie udało się edytować użytkwonika');
               exit();
             }
 

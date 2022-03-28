@@ -17,12 +17,12 @@
         $pre="1000";
         $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
         $minikwerenda="SELECT COUNT(`id`) FROM `konta` WHERE `id` LIKE '$id'";
-        $licz=$connect -> query($minikwernda);
+        $licz=konwerter($minikwerenda,$connect);
         while ($licz>0)
         {
           $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
           $minikwerenda="SELECT COUNT(`id`) FROM `konta` WHERE `id` LIKE '$id'";
-          $licz=$connect -> query($minikwernda);
+          $licz=$connect -> query($minikwerenda);
         }
         if (isset($_GET['error']))
         {
@@ -123,7 +123,7 @@
               exit();
             }
             $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
-            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `pwd`, `type`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES ('$_POST[id]', '$_POST[username]', '$haslo', '$_POST[type]', '$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]', '$_POST[date_account]')";
+            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `pwd`, `type`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`,`amount`) VALUES ('$_POST[id]', '$_POST[username]', '$haslo', '$_POST[type]', '$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]','0')";
             $connect -> query($kwerenda);
             if ($connect->affected_rows == 0)
             {

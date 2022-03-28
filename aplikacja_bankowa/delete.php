@@ -2,12 +2,13 @@
 if (isset($_GET["id"]))
 {
   require_once 'connect.php';
+  session_start();
   if (is_null($_SESSION['type']))
   {
-    header('Location: logowanie.php?error=Zaloguj się');
+    header('Location: logowanie.php?error=Zaloguj się ');
     exit();
   }
-  if($_SESSION['id']<1)
+  if($_SESSION['type']<1)
   {
     header('Location: main.php');
     exit();
@@ -27,7 +28,7 @@ if (isset($_GET["id"]))
 
 }
 else {
-  header('Location: crud.php')
+  header('Location: crud.php');
 }
 
 
