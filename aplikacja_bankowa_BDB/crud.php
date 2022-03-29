@@ -35,21 +35,27 @@
             <th>Dowód czy Paszport</th>
             <th>Nr dokumentu</th>
             <th>Data założenia konta</th>
+            <th>Zmodyfikuj konto i użytkownika</th>
+            <th>Usuń konto</th>
+            <th>Usuń użykwonika i wszyskie jego konta</th>
           </tr>
           <?php
           require_once "connect.php";
-          if ($_SESSION['type']>1)
+          if ($_SESSION['id_przywileju']>1)
           {
-            $kwerenda="SELECT `konta`.`id`, `konta`.`username`, `konta`.`amount`, `konta`.`date_account`, `uzytkownicy`.`imie`, `uzytkownicy`.`nazwisko`, `uzytkownicy`.`pesel`, `typy_dokumentow`.`nazwa`, `uzytkownicy`.`dokument_numer`, `przywileje`.`nazwa` FROM `konta` INNER JOIN `uzytkownicy` ON `uzytkownicy`.`id` = `konta`.`id_uzytkownika` INNER JOIN `typy_dokumentow` on `typy_dokumentow`.`id` = `uzytkownicy`.`id_typu_dokumentu` INNER JOIN `przywileje` ON `przywileje`.`id` = `konta`.`id_przywileju`";
+            $kwerenda="SELECT * FROM `konta`";
           }
-          else
+          elseif ($_SESSION['id_przywileju']>0)
           {
-            $kwerenda="SELECT `konta`.`id`, `konta`.`username`, `konta`.`amount`, `konta`.`date_account`, `uzytkownicy`.`imie`, `uzytkownicy`.`nazwisko`, `uzytkownicy`.`pesel`, `typy_dokumentow`.`nazwa`, `uzytkownicy`.`dokument_numer`, `przywileje`.`nazwa` FROM `konta` INNER JOIN `uzytkownicy` ON `uzytkownicy`.`id` = `konta`.`id_uzytkownika` INNER JOIN `typy_dokumentow` on `typy_dokumentow`.`id` = `uzytkownicy`.`id_typu_dokumentu` INNER JOIN `przywileje` ON `przywileje`.`id` = `konta`.`id_przywileju` WHERE `konta`.`id_przywileju` NOT LIKE '2'";
+            $kwerenda="SELECT * FROM `konta` WHERE `id_przywileju` NOT LIKE '2'";
           }
 
           $wynik= $connect -> query($kwerenda);
           while ($wiersz = $wynik -> fetch_assoc())
           {
+            $kwerenda="SELECT * FROM `uzytkownicy` WHERE `id`=$wiersz[id_uzytkownika]";
+            $wiersz2 = $connect -> query($kwerenda);
+            $wiersz2 = $wiersz2 -> fetch_assoc();
           ?>
             <tr>
               <td><?= $wiersz["id"]; ?></td>
@@ -64,13 +70,14 @@
               <td><?= $wiersz["doc_nr"]?></td>
               <td><?= $wiersz["date_account"]?></td>
               <td><a href="edytuj.php?id=<?=$wiersz['id'];?>">edytuj</a></td>
-              <td><a href="delete.php?id=<?=$wiersz['id'];?>">usuń</a></td>
+              <td><a href="delete.php?id=<?=$wiersz['id'];?>">usuń konto</a></td>
+              <td><a href="delete2.php?id=<?=$wiersz2['id'];?>">usuń urzytkownika i konto</a></td>
             </tr>
           <?php
           }
           ?>
         </table>
-        <a href="dodaj.php?id=<?=$wiersz['id'];?>">dodaj użykwonika</a>
+        <a href="dodaj.php">dodaj użykwonika</a>
     </main>
   </body>
 </html>

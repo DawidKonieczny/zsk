@@ -12,7 +12,7 @@
     ?>
     <main>
       <?php
-      if ($_SESSION['type']>0)
+      if ($_SESSION['id_przywileju']>0)
       {
         $pre="1000";
         $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
@@ -55,7 +55,7 @@
               <option value="0">Klient</option>
               <option value="1">Moderator</option>
               <?php
-              if ($_SESSION['type']>1)
+              if ($_SESSION['id_przywileju']>1)
               {
                 echo "<option value='2'>Administrator</option>";
               }

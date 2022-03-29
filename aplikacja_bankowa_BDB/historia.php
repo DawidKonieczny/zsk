@@ -6,22 +6,28 @@
     <link rel="stylesheet" href="css.css">
   </head>
   <body>
-    <?php require_once "header.php";?>
+    <?php require_once "header.php";
+    require_once "connect.php";?>
     <main>
       <article>
         <p>Sortowanie</p>
         <!–– Tu zostanie dodany system sortowania ––>
       </article>
       <table>
-        <th>Id przelewu</th>
+        <?php
+        if ($_SESSION['id_przywileju']>0) {
+          echo "<th>Id przelewu</th>";
+        }
+
+         ?>
         <th>Do kogo przelew</th>
         <th>Tytuł przelewu</th>
         <th>Wartość przelewu</th>
         <th>Data przelewu</th>
         <th>Od kogo przelew</th>
         <?php
-        require_once "connect.php";
-        if ($_SESSION['type']>0)
+
+        if ($_SESSION['id_przywileju']>0)
         {
           $kwerenda="SELECT * FROM `historia`";
         }
@@ -34,7 +40,12 @@
         {
           ?>
             <tr>
-              <td><?= $wiersz["id_history"]; ?></td>
+              <?php
+              if ($_SESSION['id_przywileju']>0) {
+                echo "<td>".$wiersz["id_history"]."</td>";
+              }
+
+               ?>
               <td><?= $wiersz["endowed"];?></td>
               <td><?= $wiersz["title"]?></td>
               <td><?= $wiersz["amount"]?></td>

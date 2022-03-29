@@ -15,7 +15,7 @@
         $_SESSION[id]
         $_SESSION[username]
         $_SESSION[pwd]
-        $_SESSION[type]
+        $_SESSION[id_przywileju]
         $_SESSION[amount]
         WHYYY??
         Dane;

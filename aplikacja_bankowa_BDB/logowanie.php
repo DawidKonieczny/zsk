@@ -53,7 +53,7 @@
             $_POST["$key"]=trim($_POST["$key"]);
             if (str_contains($_POST["$key"], ';'))
             {
-              header('Location: rejestracja.php?error=Pole' . $key.'zawiera niepoprawną wartość');
+              header('Location: logowanie.php?error=Pole' . $key.'zawiera niepoprawną wartość');
               exit();
             }
         }
@@ -63,7 +63,15 @@
         if (!$wynik)
           die($connect->error);
         $kwerenda = "SELECT `pwd` FROM `konta` WHERE `username` = '$_POST[username]'";
-        $haslo=konwerter($kwerenda,$connect);
+        $wynik = $connect -> query($kwerenda);
+        $wynik = $wynik -> fetch_assoc();
+        if(is_bool($wynik) or is_string($wynik) or is_null($wynik))
+        {
+          print_r($kwerenda);
+          header('Location: logowanie.php?error=Niepoprawne haslo lub nazwa uzytkownika');
+          exit();
+        }
+        $haslo=konwerter($kwerenda, $connect);
         print_r($haslo);
         $czyhaslo=password_verify($_POST['pwd'],$haslo);
         var_dump($czyhaslo);
@@ -72,7 +80,7 @@
           print_r($czyhaslo);
           @session_start();
 
-          $kwerenda = "SELECT `amount`, `username`, `id_przywileju`, `id`, `pwd`  FROM `konta` WHERE `username` = '$_POST[username]'";
+          $kwerenda = "SELECT `amount`, `username`, `id_przywileju`, `id`, `pwd`, `id_uzytkownika`  FROM `konta` WHERE `username` = '$_POST[username]'";
           $res=mysqli_query($connect,$kwerenda);
 
           if(!$res)

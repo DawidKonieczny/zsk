@@ -12,10 +12,10 @@ if (!function_exists('str_contains'))
 }
 function konwerter($kwerenda, $connect)
 {
-  // $wynik = $connect -> query($kwerenda);
-  // $wynik = $wynik -> fetch_assoc();
-  // $wynik =  implode("", $wynik);
-  // return $wynik;
-  return implode("", $connect -> query($kwerenda) -> fetch_assoc());
+  $wynik = $connect -> query($kwerenda);
+  $wynik = $wynik -> fetch_assoc();
+  $wynik =  implode("", $wynik);
+  return $wynik;
+  //return implode("", $connect -> query($kwerenda) -> fetch_assoc());
 }
 ?>

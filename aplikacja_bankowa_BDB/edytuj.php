@@ -25,7 +25,7 @@
      <article>
       <?php
 
-      if($_SESSION['type']>0)
+      if($_SESSION['id_przywileju']>0)
       {
         $kwerenda ="SELECT * FROM `konta` WHERE `id` =".$_GET['id'];
         $wynik=$connect -> query($kwerenda);
@@ -61,7 +61,7 @@
                 <option value="0">Klient</option>
                 <option value="1">Moderator</option>
                 <?php
-                if ($_SESSION['type']>1)
+                if ($_SESSION['id_przywileju']>1)
                 {
                   echo "<option value='2'>Administrator</option>";
                 }
@@ -119,10 +119,10 @@
               $kwerenda="SELECT `pwd` FROM `konta` WHERE `id` =".$_GET['id'];
               $_POST['pwd']=konwerter($kwerenda,$connect);
             }
-            if (empty($_POST['type']))
+            if (empty($_POST['id_przywileju']))
             {
               $kwerenda="SELECT `type` FROM `konta` WHERE `id` =".$_GET['id'];
-              $_POST['type']=konwerter($kwerenda,$connect);
+              $_POST['id_przywileju']=konwerter($kwerenda,$connect);
 
             }
             foreach($_POST as $key => $value)
