@@ -2,7 +2,7 @@
 <html lang="pl" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Strona Główna</title>
+    <title>Dodawanie uzytkownikow</title>
     <link rel="stylesheet" href="css.css">
   </head>
   <body>
@@ -12,7 +12,7 @@
     ?>
     <main>
       <?php
-      if ($_SESSION['type']>0)
+      if ($_SESSION['id_przywileju']>0)
       {
         $pre="1000";
         $id= $pre . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(1000,9999) . random_int(10,99);
@@ -51,11 +51,11 @@
 
           <label>
             Poziom stanowiska
-            <select  name="type">
-              <option value="0">Klient</option>
+            <select  name="id_przywileju">
+              <option value="0" selected>Klient</option>
               <option value="1">Moderator</option>
               <?php
-              if ($_SESSION['type']>1)
+              if ($_SESSION['id_przywileju']>1)
               {
                 echo "<option value='2'>Administrator</option>";
               }
@@ -76,7 +76,7 @@
           <label>
             Dowód czy Paszport?
             <select  name="D_czy_P">
-              <option value="D">Dowód</option>
+              <option value="D" selected>Dowód</option>
               <option value="P">Paszport</option>
             </select>
           </label><br>
@@ -104,42 +104,82 @@
         <?php
         if (!empty($_POST))
         {
-            foreach($_POST as $key => $value)
-            {
-                if (empty($value))
+          foreach($_POST as $key => $value)
+          {
+
+              if (empty($value))
+              {
+                if($key == 'id_przywileju')
                 {
-                  header('Location: edytuj.php?error=dodawanie&braki=' . $key);
+                  $_POST["$key"]='0';
+
+                }
+                else {
+                  header('Location: dodaj.php?error=Wypełnij pole ' . $key.$_POST["$key"]);
                   exit();
                 }
-            }
-            if (strlen($_POST["username"])<8)
-            {
-              header('Location: edytuj.php?error=dodawanie&braki=Nazwa użytkownika jest za krótka');
-              exit();
-            }
-            if (strlen($_POST["pwd"])<8)
-            {
-              header('Location: edytuj.php?error=dodawanie&braki=Hasło jest za krótkie');
-              exit();
-            }
-            $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
-            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `pwd`, `type`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`,`amount`) VALUES ('$_POST[id]', '$_POST[username]', '$haslo', '$_POST[type]', '$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]','0')";
+
+              }
+              if (str_contains($_POST["$key"], ';'))
+              {
+                header('Location: dodaj.php?error=Pole' . $key.'zawiera niepoprawną wartość');
+                exit();
+              }
+          }
+
+          if (strlen($_POST["username"])<8)
+          {
+            header('Location: dodaj.php?error=Nazwa użytkownika jest za krótka');
+            exit();
+          }
+          if (strlen($_POST['pwd'])<8)
+          {
+            header('Location: dodaj.php?error=Hasło jest za krótkie');
+            exit();
+          }
+          $minik="SELECT `username` FROM `konta` WHERE `id` LIKE '$_POST[username]'";
+          $licz2 = $connect -> query($minik);
+          if(mysqli_num_rows($licz2)>0)
+          {
+            header("Location: dodaj.php?error=Istnieje już taka nazwa użytkownika");
+            exit();
+          }
+
+          $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
+
+          $kwerenda = "SELECT `id` FROM `uzytkownicy` WHERE `pesel` = '$_POST[pesel]'";
+          $wynik = $connect -> query($kwerenda);
+          $wynik = $wynik -> fetch_assoc();
+
+          if(is_bool($wynik) or is_string($wynik) or is_null($wynik))
+          {
+            $kwerenda = "INSERT INTO `uzytkownicy` (`uzytkownicy`.`imie`, `uzytkownicy`.`nazwisko`, `uzytkownicy`.`domek`, `uzytkownicy`.`pesel`, `uzytkownicy`.`id_typu_dokumentu`, `uzytkownicy`.`dokument_numer`) VALUES ('$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]')";
             $connect -> query($kwerenda);
-            if ($connect->affected_rows == 0)
-            {
-              header('Location: dodaj.php?error=Nie udało się dodać użytkownika');
-            }
-            else
-            {
-              header('Location: logowanie.php?error=Utworzono konto');
-            }
+          }
 
-        }
+          $kwerenda = "SELECT `id` FROM `uzytkownicy` WHERE `pesel` = '$_POST[pesel]'";
+          $wynik = konwerter($kwerenda,$connect);
+          $kwerenda = "INSERT INTO `konta` (`konta`.`id`, `konta`.`username`, `konta`.`pwd`, `konta`.`id_przywileju`, `konta`.`amount`, `konta`.`id_uzytkownika`) VALUES ('$id', '$_POST[username]', '$haslo', '0', '0','$wynik')";
+          $connect -> query($kwerenda);
+          if ($connect->affected_rows > 0)
+          {
+
+            header('Location: dodaj.php?error=Utworzono konto');
+            exit();
+          }
+          else
+          {
+            header('Location: dodaj.php?error=Nie udało się dodać użytkownika');
+            exit();
+          }
 
       }
-      else {
-        header('Location: main.php');
-      }
+    }
+
+    else {
+        header('Location: ./');
+    }
+
       ?>
     </main>
   </body>

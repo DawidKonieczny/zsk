@@ -22,29 +22,34 @@
       ?>
       <article>
         <?php
-        $kwerenda="SELECT * FROM `konta` WHERE `id` = '$_SESSION[id]';";
+
+        $kwerenda="SELECT * FROM `uzytkownicy` WHERE `id` = '$_SESSION[id_uzytkownika]'";
         $wynik= $connect -> query($kwerenda);
-        while ($wiersz= $wynik -> fetch_assoc())
+        $wiersz= $wynik -> fetch_assoc();
+
+        $kwerenda="SELECT * FROM `konta` WHERE `id` = '$_SESSION[id]'";
+        $wynik= $connect -> query($kwerenda);
+        $wiersz1= $wynik -> fetch_assoc();
+        echo "<p> Numer konta : <br> $wiersz1[id]</p>";
+        echo "<p> Stan konta : <br> $wiersz1[amount]zł</p>";
+        if(true)
         {
-
-          echo "<p> Numer konta : <br> $wiersz[id]</p>";
-
         ?>
           <form action="saldo.php" method="post">
 
             <label>
               Imie
-              <input type="text" name="name" value="<?=$wiersz['name'];?>">
+              <input type="text" name="name" value="<?=$wiersz['imie'];?>">
             </label><br>
 
             <label>
               Nazwisko
-              <input type="text" name="surname" value="<?=$wiersz['surname'];?>">
+              <input type="text" name="surname" value="<?=$wiersz['nazwisko'];?>">
             </label><br>
 
             <label>
               Miejsce Zamieszkania
-              <input type="text" name="home" value="<?=$wiersz['home'];?>">
+              <input type="text" name="home" value="<?=$wiersz['domek'];?>">
             </label><br>
 
             <label>
@@ -54,20 +59,34 @@
 
             <label>
               Dowód czy Paszport?
-              <select  name="D_czy_P" value="<?=$wiersz['D_czy_P'];?>">
-                <option value="D">Dowód</option>
-                <option value="P">Paszport</option>
+              <select  name="D_czy_P" value="<?=$wiersz['id_typu_dokumentu'];?>">
+                <?php
+                if ($wiersz['id_typu_dokumentu'] == "P" )
+                {
+                  echo <<< here
+                  <option value="D">Dowód</option>
+                  <option value="P" selected>Paszport</option>
+                  here;
+                }
+                else {
+                  echo <<< here
+                  <option value="D" selected>Dowód</option>
+                  <option value="P" >Paszport</option>
+                  here;
+                }
+
+                 ?>
               </select>
             </label><br>
 
             <label>
               Nr Dowodu/Paszportu
-              <input type="text" name="doc_nr" value="<?=$wiersz['doc_nr'];?>">
+              <input type="text" name="doc_nr" value="<?=$wiersz['dokument_numer'];?>">
             </label><br>
 
             <label>
               Nazwa użytkownika (powinna posiadać min 8 znaków)
-              <input type="text" name="username" value="<?=$wiersz['username'];?>">
+              <input type="text" name="username" value="<?=$wiersz1['username'];?>">
             </label><br>
 
             <label>
@@ -117,17 +136,20 @@
               exit();
             }
             $haslo=password_hash($_POST['pwd'],PASSWORD_ARGON2I);
-            $kwerenda = "UPDATE `konta` SET  `username`='$_POST[username]', `pwd`='$haslo',`name`='$_POST[name]', `surname`='$_POST[surname]', `home`='$_POST[home]', `pesel`='$_POST[pesel]', `D_czy_P`='$_POST[D_czy_P]',
-            `doc_nr`='$_POST[doc_nr]', `date_account`='$_POST[date_account]' WHERE `id`='$_SESSION[id]'";
+            $kwerenda = "UPDATE `konta` SET  `username`='$_POST[username]', `pwd`='$haslo' WHERE `id`='$_SESSION[id]'";
             $connect -> query($kwerenda);
-            if ($connect->affected_rows == 0)
+            $kwerenda = "UPDATE `uzytkownicy` SET `imie`='$_POST[name]', `nazwisko`='$_POST[surname]', `domek`='$_POST[home]', `pesel`='$_POST[pesel]', `id_typu_dokumentu`='$_POST[D_czy_P]',
+            `dokument_numer`='$_POST[doc_nr]' WHERE `id`='$_SESSION[id_uzytkownika]'";
+            $connect -> query($kwerenda);
+            if ($connect->affected_rows > 0)
             {
-              header('Location: saldo.php?braki=Nie udało się zmienić danych użytkownika');
+
+              header('Location: saldo.php?braki=Udało zmienić się dane użytkownika');
               exit();
             }
             else
             {
-              header('Location: saldo.php?braki=Udało zmienić się dane użytkownika');
+              header('Location: saldo.php?braki=Nie udało się zmienić danych użytkownika');
               exit();
             }
 

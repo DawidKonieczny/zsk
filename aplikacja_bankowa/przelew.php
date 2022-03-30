@@ -69,7 +69,7 @@
           }
 
 
-          if( 0 > $_POST['amount'])
+          if( 0 >= $_POST['amount'])
           {
             header('Location: przelew.php?error=Niepowrawna wartość przelewu');
             exit();
@@ -82,7 +82,7 @@
             exit();
           }
 
-          $kwerenda = "INSERT INTO `historia`(`id_history`, `endowed`, `title`, `amount`, `generous`) VALUES ( NULL,'$_POST[endowed]','$_POST[title]','$amountt','$_SESSION[id]')";
+          $kwerenda = "INSERT INTO `historia`(`endowed`, `title`, `amount`, `generous`) VALUES ('$_POST[endowed]','$_POST[title]','$amountt','$_SESSION[id]')";
           $connect -> query($kwerenda);
           if ($connect->affected_rows < 1)
           {
@@ -91,6 +91,11 @@
           }
           $_SESSION['amount']=$_SESSION['amount']-$_POST['amount'];
           $kwerenda = " UPDATE `konta` SET `amount` = '$_SESSION[amount]' WHERE `konta`.`id` = '$_SESSION[id]'";
+          $connect -> query($kwerenda);
+          $kwerenda="SELECT `amount` FROM `konta` WHERE `konta`.`id` = '$_POST[endowed]'";
+          $wynik = konwerter($kwerenda,$connect);
+          $wynik += $_POST['amount'];
+          $kwerenda = " UPDATE `konta` SET `amount` = '$wynik' WHERE `konta`.`id` = '$_POST[endowed]'";
           $connect -> query($kwerenda);
 
           if ($connect->affected_rows > 0)

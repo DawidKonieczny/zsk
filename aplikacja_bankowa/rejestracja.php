@@ -40,7 +40,7 @@
         <label>
           Dowód czy Paszport?
           <select  name="D_czy_P">
-            <option value="D">Dowód</option>
+            <option value="D" selected>Dowód</option>
             <option value="P">Paszport</option>
           </select>
         </label><br>
@@ -75,6 +75,7 @@
         </label><br>
       </form>
       <?php
+        require_once "connect.php";
         if (!empty($_POST))
         {
 
@@ -112,12 +113,12 @@
               exit();
             }
 
-            require_once "connect.php";
+
             $minik="SELECT `username` FROM `konta` WHERE `id` LIKE '$_POST[username]'";
             $licz2 = $connect -> query($minik);
             if(mysqli_num_rows($licz2)>0)
             {
-              header("Location: rejestracja.php?error=Istnieje już taka nazwa użytkownika $licz2");
+              header("Location: rejestracja.php?error=Istnieje już taka nazwa użytkownika");
               exit();
             }
             $pre="1000";
@@ -130,19 +131,31 @@
               $minik2="SELECT `id` FROM `konta` WHERE `id` = '$id'";
               $licz=$connect -> query($minik2);
             }
-            
-            $haslo = password_hash($_POST['pwdchk'], PASSWORD_ARGON2I);
-            $kwerenda = "INSERT INTO `konta` (`id`, `username`, `pwd`, `type`, `amount`,`name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`) VALUES ('$id', '$_POST[username]', '$haslo', '0', '0', '$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]')";
-            $connect -> query($kwerenda);
 
-            if ($connect->affected_rows == 0)
+            $haslo = password_hash($_POST['pwdchk'], PASSWORD_ARGON2I);
+
+            $kwerenda = "SELECT `id` FROM `uzytkownicy` WHERE `pesel` = '$_POST[pesel]'";
+            $wynik = $connect -> query($kwerenda);
+            $wynik = $wynik -> fetch_assoc();
+
+            if(is_bool($wynik) or is_string($wynik) or is_null($wynik))
             {
-              header('Location: rejestracja.php?error=Nie udało się dodać użytkownika');
+              $kwerenda = "INSERT INTO `uzytkownicy` (`uzytkownicy`.`imie`, `uzytkownicy`.`nazwisko`, `uzytkownicy`.`domek`, `uzytkownicy`.`pesel`, `uzytkownicy`.`id_typu_dokumentu`, `uzytkownicy`.`dokument_numer`) VALUES ('$_POST[name]', '$_POST[surname]', '$_POST[home]', '$_POST[pesel]', '$_POST[D_czy_P]', '$_POST[doc_nr]')";
+              $connect -> query($kwerenda);
+            }
+            $kwerenda = "SELECT `id` FROM `uzytkownicy` WHERE `pesel` = '$_POST[pesel]'";
+            $wynik = konwerter($kwerenda,$connect);
+            $kwerenda = "INSERT INTO `konta` (`konta`.`id`, `konta`.`username`, `konta`.`pwd`, `konta`.`id_przywileju`, `konta`.`amount`, `konta`.`id_uzytkownika`) VALUES ('$id', '$_POST[username]', '$haslo', '0', '0','$wynik')";
+            $connect -> query($kwerenda);
+            if ($connect->affected_rows > 0)
+            {
+
+              header('Location: logowanie.php?error=Utworzono konto');
               exit();
             }
             else
             {
-              header('Location: logowanie.php?error=Utworzono konto');
+              header('Location: rejestracja.php?error=Nie udało się dodać użytkownika');
               exit();
             }
 

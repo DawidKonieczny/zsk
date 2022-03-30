@@ -3,26 +3,26 @@ if (isset($_GET["id"]))
 {
   require_once 'connect.php';
   session_start();
-  if (is_null($_SESSION['type']))
+  if (is_null($_SESSION['id_przywileju']))
   {
     header('Location: logowanie.php?error=Zaloguj się ');
     exit();
   }
-  if($_SESSION['type']<1)
+  if($_SESSION['id_przywileju']<1)
   {
-    header('Location: main.php');
+    header('Location: ./');
     exit();
   }
-  $kwerenda="DELETE FROM `konta` WHERE `konta`.`id` = " . $_GET['id'];
+  $kwerenda="DELETE FROM `konta` WHERE `id` = " . $_GET['id'];
   $connect -> query($kwerenda);
   if ($connect->affected_rows > 0)
   {
-    header('Location: crud.php?error=Pomyślnie usunięto użytkownika!');
+    header('Location: crud.php?error=Pomyślnie usunięto konto!');
     exit();
   }
   else
   {
-    header('Location: przelew.php?error=Nie udało się usunąć użykwonika..');
+    header('Location: crud.php?error=Nie udało się usunąć konta..');
     exit();
   }
 

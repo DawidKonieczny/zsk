@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 28 Mar 2022, 19:45
+-- Czas generowania: 30 Mar 2022, 19:39
 -- Wersja serwera: 10.4.21-MariaDB
 -- Wersja PHP: 8.0.10
 
@@ -28,12 +28,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `historia` (
-  `id_history` float NOT NULL,
-  `endowed` varchar(26) NOT NULL COMMENT 'nr konta osoby która dostała przelew',
+  `id_history` bigint(20) UNSIGNED NOT NULL,
+  `endowed` char(26) NOT NULL COMMENT 'nr konta osoby która dostała przelew',
   `title` varchar(255) NOT NULL,
   `amount` double NOT NULL,
   `date` date NOT NULL DEFAULT current_timestamp(),
-  `generous` varchar(26) NOT NULL COMMENT 'nr konta osoby która wysłała przelew'
+  `generous` char(26) NOT NULL COMMENT 'nr konta osoby która wysłała przelew'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -41,8 +41,10 @@ CREATE TABLE `historia` (
 --
 
 INSERT INTO `historia` (`id_history`, `endowed`, `title`, `amount`, `date`, `generous`) VALUES
-(1, '10001234567891234567894443', 'TestowyPrzelew', 1, '2022-03-17', '10001234567891234567894444'),
-(2, '10001234567891234567894444', 'Smoki', 2, '2022-03-27', '1000193240664962621954');
+(3, '10006604917428373257600391', 'Owca', 1, '2022-03-29', '10009935194919737728282242'),
+(4, '10006604917428373257600391', 'Dwie Owce', 2, '2022-03-29', '10009935194919737728282242'),
+(5, '10006604917428373257600391', 'Trzy Owce', 3, '2022-03-29', '10009935194919737728282242'),
+(6, '10006604917428373257600391', 'Cztery Owce', 4, '2022-03-29', '10009935194919737728282242');
 
 -- --------------------------------------------------------
 
@@ -54,28 +56,82 @@ CREATE TABLE `konta` (
   `id` char(26) NOT NULL COMMENT 'numer konta',
   `username` varchar(50) NOT NULL,
   `pwd` varchar(255) NOT NULL,
-  `type` int(1) NOT NULL COMMENT '0-klient 1-moderator\r\n2-admin',
+  `id_przywileju` bigint(20) UNSIGNED NOT NULL,
   `amount` varchar(57) NOT NULL COMMENT 'ilość środków na koncie',
-  `name` varchar(57) NOT NULL,
-  `surname` varchar(28) NOT NULL,
-  `home` text NOT NULL,
-  `pesel` char(11) NOT NULL,
-  `D_czy_P` char(1) NOT NULL COMMENT 'Dowód czy Paszport',
-  `doc_nr` char(9) NOT NULL COMMENT 'numer dokumentu',
-  `date_account` date NOT NULL DEFAULT current_timestamp() COMMENT 'data założenia konta'
+  `date_account` date NOT NULL DEFAULT current_timestamp() COMMENT 'data założenia konta',
+  `id_uzytkownika` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Zrzut danych tabeli `konta`
 --
 
-INSERT INTO `konta` (`id`, `username`, `pwd`, `type`, `amount`, `name`, `surname`, `home`, `pesel`, `D_czy_P`, `doc_nr`, `date_account`) VALUES
-('10000000000000000000000001', 'testModerator', '$argon2i$v=19$m=16,t=2,p=1$NUJCRWxxUEh0N2QzNDZweQ$FZ1fwLVBRC6IZ/srf6Bjhc', 1, '12', 'Zbigniew', 'Kowalski', 'blisko', '11111111117', 'P', 'zw1234563', '2022-03-16'),
-('10000000000000000000000006', 'Testujemy', '$argon2i$v=19$m=65536,t=4,p=1$eEpwclNTN0hjRXd5dnZ2cQ$ehDgUpZumUGRFiKUXQ7aAx952BBKFsVJRAyFrgifGtE', 2, '98', 'Piotrek', 'Konieczny', 'tu i tam', '01501601419', 'D', 'xx1234568', '2022-03-01'),
-('10001932406649626219545555', 'Testujem', '$argon2i$v=19$m=65533,t=2,p=1$ZUVwd2NsTlROMGhqUlhkNWRuWjJjUQ$kPI7tHp4Gi/CD206cNVs+Q', 2, '98', 'Dawid', 'Konieczny', 'tu', '01501601413', 'D', 'xx1234567', '2022-03-01'),
-('10002065381862332620468148', 'HK12345678', '$argon2i$v=19$m=65536,t=4,p=1$R2ZrTDZUYzJ3aXVXSEtyaw$rY7po7LWiYAlstRLOmD4K79PBx3amIlzTfJGWehfy3w', 0, '0', 'Henry', 'Patyk', 'Dom', '02203467581', 'D', 'aa1234567', '2022-03-28'),
-('1000744944906855504657', 'SmokWawel', '$argon2i$v=19$m=65536,t=4,p=1$MEJZanVGNUNPMlJ6UFJvZQ$iOXnSnKz5aaasT3UsmzBKSdlfXqq1c6kiz3L7DLBqMQ', 1, '', 'Smok', 'Wawelskii', 'Krawkowie', '12132312314', 'D', 'qw2345678', '2022-03-09'),
-('10009319641722905540642469', 'HK123456782', '$argon2i$v=19$m=65536,t=4,p=1$VUVVa0hiYy5LTXZheXRDQQ$j2iBa7j7oflORMXRa4OOi6UKmtual/H08lgRHiuuZT4', 0, '0', 'Henry', 'Konieczny', 'Dom', '02303467581', 'D', 'aa1234567', '2022-03-28');
+INSERT INTO `konta` (`id`, `username`, `pwd`, `id_przywileju`, `amount`, `date_account`, `id_uzytkownika`) VALUES
+('1000171981861026101742', 'HK12345678', '$argon2i$v=19$m=65536,t=4,p=1$emJaVC55d0ZiNThWd2RlaA$nfyBXW7yxbTIaCTfRSB295ygq5hVDDlkvNWxvwtffhU', 0, '0', '2022-03-30', 6),
+('10006604917428373257600391', 'SmokWawel', '$argon2i$v=19$m=65536,t=4,p=1$M203eGNiS3VWTC5XYWo1dQ$mt7sUSqJyKCJhqy4mrCJsonSryoJN1IHZCwM+nH30Q0', 2, '6', '2022-03-29', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `przywileje`
+--
+
+CREATE TABLE `przywileje` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nazwa` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Zrzut danych tabeli `przywileje`
+--
+
+INSERT INTO `przywileje` (`id`, `nazwa`) VALUES
+(0, 'Klient'),
+(1, 'Moderator'),
+(2, 'Administrator');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `typy_dokumentow`
+--
+
+CREATE TABLE `typy_dokumentow` (
+  `id` char(1) NOT NULL,
+  `nazwa` varchar(32) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Zrzut danych tabeli `typy_dokumentow`
+--
+
+INSERT INTO `typy_dokumentow` (`id`, `nazwa`) VALUES
+('D', 'Dowód'),
+('P', 'Paszport');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `uzytkownicy`
+--
+
+CREATE TABLE `uzytkownicy` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `imie` varchar(128) NOT NULL,
+  `nazwisko` varchar(64) NOT NULL,
+  `pesel` char(11) NOT NULL,
+  `id_typu_dokumentu` char(1) NOT NULL,
+  `dokument_numer` char(9) NOT NULL,
+  `domek` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Zrzut danych tabeli `uzytkownicy`
+--
+
+INSERT INTO `uzytkownicy` (`id`, `imie`, `nazwisko`, `pesel`, `id_typu_dokumentu`, `dokument_numer`, `domek`) VALUES
+(3, 'Smok', 'Wawelski', '01501601413', 'D', 'aa1234567', 'Kraków'),
+(6, 'Henry', 'Patyk', '02203467581', 'D', 'aa1234567', 'Dom');
 
 --
 -- Indeksy dla zrzutów tabel
@@ -85,13 +141,37 @@ INSERT INTO `konta` (`id`, `username`, `pwd`, `type`, `amount`, `name`, `surname
 -- Indeksy dla tabeli `historia`
 --
 ALTER TABLE `historia`
-  ADD PRIMARY KEY (`id_history`);
+  ADD PRIMARY KEY (`id_history`),
+  ADD UNIQUE KEY `id_history` (`id_history`);
 
 --
 -- Indeksy dla tabeli `konta`
 --
 ALTER TABLE `konta`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_uzytkownika` (`id_uzytkownika`),
+  ADD KEY `id_przywileju` (`id_przywileju`);
+
+--
+-- Indeksy dla tabeli `przywileje`
+--
+ALTER TABLE `przywileje`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`);
+
+--
+-- Indeksy dla tabeli `typy_dokumentow`
+--
+ALTER TABLE `typy_dokumentow`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indeksy dla tabeli `uzytkownicy`
+--
+ALTER TABLE `uzytkownicy`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `id_typu_dokumentu` (`id_typu_dokumentu`);
 
 --
 -- AUTO_INCREMENT dla zrzuconych tabel
@@ -101,7 +181,36 @@ ALTER TABLE `konta`
 -- AUTO_INCREMENT dla tabeli `historia`
 --
 ALTER TABLE `historia`
-  MODIFY `id_history` float NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_history` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT dla tabeli `przywileje`
+--
+ALTER TABLE `przywileje`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT dla tabeli `uzytkownicy`
+--
+ALTER TABLE `uzytkownicy`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- Ograniczenia dla zrzutów tabel
+--
+
+--
+-- Ograniczenia dla tabeli `konta`
+--
+ALTER TABLE `konta`
+  ADD CONSTRAINT `konta_ibfk_1` FOREIGN KEY (`id_uzytkownika`) REFERENCES `uzytkownicy` (`id`),
+  ADD CONSTRAINT `konta_ibfk_2` FOREIGN KEY (`id_przywileju`) REFERENCES `przywileje` (`id`);
+
+--
+-- Ograniczenia dla tabeli `uzytkownicy`
+--
+ALTER TABLE `uzytkownicy`
+  ADD CONSTRAINT `uzytkownicy_ibfk_1` FOREIGN KEY (`id_typu_dokumentu`) REFERENCES `typy_dokumentow` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

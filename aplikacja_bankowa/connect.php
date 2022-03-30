@@ -1,10 +1,7 @@
 <?php
 $connect = new mysqli("localhost", "root", "", "aplikacja_bankowa");
-if (function_exists('str_contains'))
+if (!function_exists('str_contains'))
 {
-
-}
-else {
   function str_contains($heystack, $needle)
   {
     foreach(explode($heystack,"") as $character)
@@ -15,11 +12,10 @@ else {
 }
 function konwerter($kwerenda, $connect)
 {
-  $wynik=$connect -> query($kwerenda);
-  $wynik= $wynik -> fetch_assoc();
-  $wynik=  implode("",$wynik);
-
-
+  $wynik = $connect -> query($kwerenda);
+  $wynik = $wynik -> fetch_assoc();
+  $wynik =  implode("", $wynik);
   return $wynik;
+  //return implode("", $connect -> query($kwerenda) -> fetch_assoc());
 }
 ?>
